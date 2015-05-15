@@ -1,0 +1,40 @@
+{
+  "name": "cssonar",
+  "version": "0.1.0-dev",
+  "description": "Detect CSS selector prevalence in your web application.",
+  "author": {
+    "name": "Tableau Mkt Web",
+    "email": ""
+  },
+  "repository": "tableau-mkt/cssonar",
+  "license": "MIT",
+  "files": [
+    "index.js",
+    "cli.js"
+  ],
+  "keywords": [
+    "dom",
+    "selector",
+    "risk"
+  ],
+  "dependencies": {
+    "meow": "^3.1.0",
+    "cli-config": "~0.4"
+  },
+  "devDependencies": {
+    "grunt-cli": "^0.1.13",
+    "grunt-contrib-jshint": "^0.11.0",
+    "grunt-contrib-nodeunit": "^0.4.1",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-mocha-cli": "^1.12.0",
+    "jshint-stylish": "^1.0.1",
+    "load-grunt-tasks": "^3.1.0",
+    "time-grunt": "^1.1.0"
+  },
+  "scripts": {
+    "test": "grunt"
+  },
+  "bin": {
+    "cssonar": "cli.js"
+  }
+}
