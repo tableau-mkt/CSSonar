@@ -1,4 +1,6 @@
 {
-  "urls": [],
+  "urls": [
+    "https://www.tableau.com/"
+  ],
   "warnThreshold": 0.5
 }
