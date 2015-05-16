@@ -4,12 +4,19 @@ var _ = require('underscore');
 
 module.exports = {
 
+  configs: {},
+
   /**
    * Main program execution.
    * @param {array} selectors
    * @param {object} config
    */
   main: function(selectors, config) {
+    // Stash the selectors on a scoped config object.
+    config.selectors = selectors;
+    this.configs = config;
+
+    // Iterate through all URLs, load, and process the page.
     _.each(config.urls, function(url) {
       this.loadPage(url, this.processPage);
     }, this);
@@ -23,10 +30,11 @@ module.exports = {
    * @param {processWindowClosure} closure
    */
   loadPage: function(url, closure) {
-    var jsdom = require('jsdom');
+    var jsdom = require('jsdom'),
+        that = this;
 
     jsdom.env(url, [], function(errors, window) {
-      closure(window);
+      closure.call(that, window);
       window.close();
     });
   },
@@ -37,8 +45,13 @@ module.exports = {
    * @param {object} window
    */
   processPage: function(window) {
-    var Sizzle = require('node-sizzle').sizzleInit(window);
-    console.log(Sizzle.matches('h1').length);
+    var Sizzle = require('node-sizzle').sizzleInit(window),
+        selectors = this.configs.selectors || [];
+
+    // Iterate through all provided selectors.
+    _.each(selectors, function(selector) {
+      console.log(selector + ': ' + Sizzle.matches(selector).length);
+    }, this);
   }
 
 };
