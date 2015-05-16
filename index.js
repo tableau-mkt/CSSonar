@@ -1,6 +1,7 @@
 'use strict';
 
-var _ = require('underscore');
+var _ = require('underscore'),
+    Promise = require('promise');
 
 module.exports = {
 
@@ -8,50 +9,109 @@ module.exports = {
 
   /**
    * Main program execution.
-   * @param {array} selectors
-   * @param {object} config
+   *
+   * @param {Array} selectors
+   *   An array of selectors to use when querying a list of pages.
+   *
+   * @param {Object} config
+   *   The CSSonar config object.
+   *
+   * @param {Function} callback
+   *   A callback function to be run with the results of the CSSonar scan. This
+   *   callback should take two arguments: error, and response.
    */
-  main: function(selectors, config) {
+  main: function(selectors, config, callback) {
+    var response = {};
+
     // Stash the selectors on a scoped config object.
     config.selectors = selectors;
     this.configs = config;
 
     // Iterate through all URLs, load, and process the page.
-    _.each(config.urls, function(url) {
-      this.loadPage(url, this.processPage);
-    }, this);
-  },
-
-  /**
-   * Loads the DOM of the given URL, then passes that page's window as the only
-   * argument to the provided closure.
-   *
-   * @param {string} url
-   * @param {processWindowClosure} closure
-   */
-  loadPage: function(url, closure) {
-    var jsdom = require('jsdom'),
-        that = this;
-
-    jsdom.env(url, [], function(errors, window) {
-      closure.call(that, window);
-      window.close();
+    this.processPages.call(this, config.urls).done(function(results) {
+      response.sonar = results;
+      response.stats = {};
+      callback(null, response);
+    }, function(err) {
+      callback(err, null);
     });
   },
 
   /**
-   * Perform processing on a window object.
-   * @callback processWindowClosure
-   * @param {object} window
+   * Processes a list of pages.
+   *
+   * @param {Array} urls
+   *   An array of URLs representing pages to be processed.
+   *
+   * @returns {Promise[]}
+   *   An array of promises for each provided URL.
    */
-  processPage: function(window) {
-    var Sizzle = require('node-sizzle').sizzleInit(window),
-        selectors = this.configs.selectors || [];
+  processPages: function(urls) {
+    return Promise.all(urls.map(this.preparePage, this));
+  },
 
-    // Iterate through all provided selectors.
-    _.each(selectors, function(selector) {
-      console.log(selector + ': ' + Sizzle.matches(selector).length);
-    }, this);
+  /**
+   * Attempts to compile the window object for a given URL, then if successful,
+   * query the window for all configured selectors.
+   *
+   * @param {String} url
+   *   The URL of the page to be prepared.
+   *
+   * @returns {Promise}
+   *   If fulfilled, the promise will pass an object mapping a URL to an object
+   *   representing query stats for the page.
+   */
+  preparePage: function(url) {
+    var that = this,
+        response = {};
+
+    return new Promise(function(fulfill, reject) {
+      that.compileWindow(url).done(function (window) {
+        response[url] = that.queryPage.call(that, window, that.configs.selectors);
+        fulfill(response);
+      }, reject);
+    });
+  },
+
+  /**
+   * Compile a window object for a given URL.
+   *
+   * @param {String} url
+   *   The URL of the page whose window object is desired.
+   *
+   * @returns {Promise}
+   *   If fulfilled, the promise will pass the compiled window object.
+   */
+  compileWindow: function(url) {
+    return new Promise(function(fulfill, reject) {
+      require('jsdom').env(url, [], function(errors, window) {
+        if (errors) reject(errors);
+        else fulfill(window);
+      });
+    });
+  },
+
+  /**
+   * Queries the given window object for the given selectors.
+   *
+   * @param {Object} window
+   *   A standard window object.
+   *
+   * @param {Array} selectors
+   *   An array of selectors with which to query the window.
+   *
+   * @returns {Object}
+   *   A map showing counts of selectors on this page, keyed by selector.
+   */
+  queryPage: function(window, selectors) {
+    var Sizzle = require('node-sizzle').sizzleInit(window),
+        response = {};
+
+    selectors.map(function(selector) {
+      response[selector] = Sizzle.matches(selector).length;
+    });
+
+    return response;
   }
 
 };
