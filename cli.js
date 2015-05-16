@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 'use strict';
 
-var meow = require('meow'),
-    cssonar = require('./'),
+var CSSonar = require('./'),
+    meow = require('meow'),
     config = require('cli-config').getConfig({
       dirname: __dirname,
       merge: 'deep',
@@ -18,4 +18,7 @@ var meow = require('meow'),
       ].join('\n')
     });
 
-cssonar.main(cli.input, config);
+CSSonar.main(cli.input, config, function(err, results) {
+  if (err) console.error(err);
+  else console.log(JSON.stringify(results))
+});

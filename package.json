@@ -22,7 +22,8 @@
     "cli-config": "~0.4",
     "jsdom": "~3",
     "underscore": "~1",
-    "node-sizzle": "~0.1"
+    "node-sizzle": "~0.1",
+    "promise": "~7"
   },
   "devDependencies": {
     "grunt-cli": "^0.1.13",
