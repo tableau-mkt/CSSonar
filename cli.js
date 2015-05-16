@@ -18,4 +18,4 @@ var meow = require('meow'),
       ].join('\n')
     });
 
-cssonar(cli.input[0]);
+cssonar.main(cli.input, config);
