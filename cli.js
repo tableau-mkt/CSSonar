@@ -18,7 +18,7 @@ var CSSonar = require('./'),
       ].join('\n')
     });
 
-CSSonar.main(cli.input, config, function(err, results) {
+CSSonar.main(config, cli.input, function(err, results) {
   if (err) console.error(err);
   else console.log(JSON.stringify(results))
 });

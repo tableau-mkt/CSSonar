@@ -10,17 +10,17 @@ module.exports = {
   /**
    * Main program execution.
    *
-   * @param {Array} selectors
-   *   An array of selectors to use when querying a list of pages.
-   *
    * @param {Object} config
    *   The CSSonar config object.
+   *
+   * @param {Array} selectors
+   *   An array of selectors to use when querying a list of pages.
    *
    * @param {Function} callback
    *   A callback function to be run with the results of the CSSonar scan. This
    *   callback should take two arguments: error, and response.
    */
-  main: function(selectors, config, callback) {
+  main: function(config, selectors, callback) {
     var response = {};
 
     // Stash the selectors on a scoped config object.
