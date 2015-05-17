@@ -10,24 +10,19 @@ $ npm install --save tableau-mkt/cssonar
 ```
 
 
-## Configuration
-
-Add a `.cssonar.json` file to your project's root. The JSON file should contain
-an object with the following properties:
-
-- __urls__: An array of representative URLs that CSSonar will ping to determine
-  selector prevalence.
-- __warnThreshold__: A float representing a percentage threshold above which a
-  warning should be shown (e.g. warn if `0.5` or 50% of all pages match the
-  provided CSS selector list.
-
-
 ## Usage
 
 ```js
-var CSSonar = require('cssonar');
+var CSSonar = require('cssonar'),
+    config = {};
 
-CSSonar.scan({urls: ['http://example.com']}, ['a.cta'], function(err, results) {
+// Check for provided selectors on the following URL(s).
+config.urls = ['http://example.com', 'http://example.com/bar'];
+
+// Warn when greater than 80% of provided URLs contain the provided selectors.
+config.warnThreshold = 0.8;
+
+CSSonar.scan(config, ['a.cta', 'td > a:first-child'], function(err, results) {
   // Get the total count of all instances of all selectors across all pages.
   results.count();
 
@@ -52,6 +47,16 @@ CSSonar.scan({urls: ['http://example.com']}, ['a.cta'], function(err, results) {
 
 
 ## Commandline Usage
+Add a `.cssonar.json` file to your project's root. The JSON file should contain
+an object with the following properties:
+
+- __urls__: An array of representative URLs that CSSonar will ping to determine
+  selector prevalence.
+- __warnThreshold__: A float representing a percentage threshold above which a
+  warning should be shown (e.g. warn if `0.5` or 50% of all pages match the
+  provided CSS selector list.
+
+
 ```sh
 $ npm install --global tableau-mkt/cssonar
 $ cd /path/to/your/webapp/root # contains your .cssonar.json file
