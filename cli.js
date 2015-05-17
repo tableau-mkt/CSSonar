@@ -11,10 +11,10 @@ var CSSonar = require('./'),
     cli = meow({
       help: [
         'Usage',
-        '  cssonar <input>',
+        '  cssonar <css-selectors>',
         '',
         'Example',
-        '  cssonar Unicorn'
+        '  cssonar "a.cta" "input.submit"'
       ].join('\n')
     }),
     colors = require('colors');
