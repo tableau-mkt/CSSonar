@@ -20,16 +20,14 @@ module.exports = {
    *   A callback function to be run with the results of the CSSonar scan. This
    *   callback should take two arguments: error, and response.
    */
-  main: function(config, selectors, callback) {
-    var that = this;
-
+  scan: function(config, selectors, callback) {
     // Stash the selectors on a scoped config object.
     config.selectors = selectors;
     this.configs = config;
 
     // Iterate through all URLs, load, and process the page.
     this.processPages.call(this, config.urls).done(function(results) {
-      callback(null, that.formatResponse(results));
+      callback(null, require('./beamform.js')(results));
     }, function(err) {
       callback(err, null);
     });
@@ -107,71 +105,6 @@ module.exports = {
 
     selectors.map(function(selector) {
       response[selector] = Sizzle.matches(selector).length;
-    });
-
-    return response;
-  },
-
-  /**
-   * Takes an array of count details and transforms them into a response object
-   * of the format expected from this module.
-   *
-   * @param {Object[]} data
-   *   An array of objects representing selector counts for a URL. The object
-   *   consists of a single object, keyed by URL, which is itself an object
-   *   mapping selectors to counts.
-   *
-   * @returns {Object}
-   *   Returns an object containing the following keys:
-   *   - count: An integer representing the total sum of selector hits across
-   *     all pages.
-   *   - countByUrl: A map of URLs and their selector hit counts.
-   *   - countBySelector: A map of selectors and their hit counts.
-   *   - countByUrlBySelector: Similar to countByUrl, but broken down one layer
-   *     deeper by selector.
-   *   - countBySelectorByUrl: Similar to countBySelector, but broken down one
-   *     layer deeper by URL.
-   */
-  formatResponse: function(data) {
-    var response = {
-          count: 0,
-          countByUrl: {},
-          countBySelector: {},
-          countByUrlBySelector: {},
-          countBySelectorByUrl: {},
-          metadata: {}
-        },
-        url;
-
-    data.map(function(obj) {
-      url = Object.keys(obj)[0];
-
-      for (var sel in obj[url]) {
-        if (obj[url].hasOwnProperty(sel)) {
-          // Initialize.
-          response.countByUrl[url] = response.countByUrl[url] || 0;
-          response.countBySelector[sel] = response.countBySelector[sel] || 0;
-          response.countByUrlBySelector[url] = response.countByUrlBySelector[url] || {};
-          response.countByUrlBySelector[url][sel] = response.countByUrlBySelector[url][sel] || 0;
-          response.countBySelectorByUrl[sel] = response.countBySelectorByUrl[sel] || {};
-          response.countBySelectorByUrl[sel][url] = response.countBySelectorByUrl[sel][url] || 0;
-
-          // Stash total count overall.
-          response.count += obj[url][sel];
-
-          // Stash total count for this URL.
-          response.countByUrl[url] += obj[url][sel];
-
-          // Stash total count by URL by selector.
-          response.countByUrlBySelector[url][sel] += obj[url][sel];
-
-          // Stash total count for this selector.
-          response.countBySelector[sel] += obj[url][sel];
-
-          // Stash total count by selector by URL.
-          response.countBySelectorByUrl[sel][url] += obj[url][sel];
-        }
-      }
     });
 
     return response;

@@ -9,6 +9,7 @@
 $ npm install --save tableau-mkt/cssonar
 ```
 
+
 ## Configuration
 
 Add a `.cssonar.json` file to your project's root. The JSON file should contain
@@ -20,44 +21,35 @@ an object with the following properties:
   warning should be shown (e.g. warn if `0.5` or 50% of all pages match the
   provided CSS selector list.
 
+
 ## Usage
 
 ```js
 var CSSonar = require('cssonar');
 
-CSSonar.main({urls: ['http://example.com']}, ['a.cta'], function(err, results) {
-  console.log(results);
+CSSonar.scan({urls: ['http://example.com']}, ['a.cta'], function(err, results) {
+  // Get the total count of all instances of all selectors across all pages.
+  results.count();
+
+  // Get a map of selector occurrence count keyed by page URL.
+  results.countBy('url');
+
+  // Get a map of selector occurrence count keyed by selector.
+  results.countBy('selector');
+
+  // Get a nested map of selector occurrence counts whose outer keys are URLs
+  // and whose inner keys are selectors.
+  results.deepCountBy('url', 'selector');
+
+  // Get a nested map of selector occurrence counts whose outer keys are
+  // selectors and whose inner keys are page URLs.
+  results.deepCountBy('selector', 'url');
+
+  // Get metadata associated with this CSSonar scan.
+  results.metadata();
 });
 ```
 
-In the above example, `results` would be an object similar to the following:
-```json
-{
-  "count": 5,
-  "countByUrl": {
-    "http://example.com": 3,
-    "http://example.com/bar": 2
-  },
-  "countBySelector": {
-    "a.cta": 5
-  },
-  "countByUrlBySelector": {
-    "http://example.com": {
-      "a.cta": 3,
-    },
-    "http://example.com/bar": {
-      "a.cta": 2,
-    }
-  },
-  "countBySelectorByUrl": {
-    "a.cta": {
-      "http://example.com": 2,
-      "http://example.com/bar": 3,
-    }
-  },
-  "metadata": {}
-}
-```
 
 ## Commandline Usage
 ```sh

@@ -20,8 +20,10 @@ var CSSonar = require('./'),
     colors = require('colors');
 
 console.log(colors.inverse(' CSSonar ') + '\n');
-CSSonar.main(config, cli.input, function(err, results) {
-  var pagesAffected = 0,
+CSSonar.scan(config, cli.input, function(err, results) {
+  var countByUrl = results.countBy('url'),
+      countBySelector = results.countBy('selector'),
+      pagesAffected = 0,
       unusedSelectors = 0,
       percentPagesAffected,
       warnPages;
@@ -33,8 +35,8 @@ CSSonar.main(config, cli.input, function(err, results) {
   }
 
   // Calculate number of affected pages.
-  Object.keys(results.countByUrl).map(function(url) {
-    if (results.countByUrl[url]) {
+  Object.keys(countByUrl).map(function(url) {
+    if (countByUrl[url]) {
       pagesAffected++;
     }
   });
@@ -42,8 +44,8 @@ CSSonar.main(config, cli.input, function(err, results) {
   warnPages = percentPagesAffected >= config.warnThreshold * 100;
 
   // Calculate number of unused selectors.
-  Object.keys(results.countBySelector).map(function(selector) {
-    if (results.countBySelector[selector] === 0) {
+  Object.keys(countBySelector).map(function(selector) {
+    if (countBySelector[selector] === 0) {
       unusedSelectors++;
     }
   });
@@ -51,7 +53,7 @@ CSSonar.main(config, cli.input, function(err, results) {
   // Elements affected.
   console.log([
     colors.bold('Distinct elements across all pages:'),
-    colors['reset'](results.count)
+    colors['reset'](results.count())
   ].join(' '));
 
   // Pages affected.
