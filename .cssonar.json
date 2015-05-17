@@ -1,8 +1,4 @@
 {
-  "urls": [
-    "https://www.tableau.com/",
-    "https://www.tableau.com/products/desktop",
-    "https://www.tableau.com/learn/training"
-  ],
+  "urls": [],
   "warnThreshold": 0.5
 }
