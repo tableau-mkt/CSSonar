@@ -10,6 +10,7 @@
   "license": "MIT",
   "files": [
     "index.js",
+    "beamform.js",
     "cli.js"
   ],
   "keywords": [

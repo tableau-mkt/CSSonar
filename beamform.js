@@ -107,7 +107,7 @@ module.exports = function(rawData) {
      *
      * @returns {Object}
      */
-    metaData: function() {
+    metadata: function() {
       return data.metdata;
     }
 
