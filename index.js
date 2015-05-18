@@ -1,7 +1,6 @@
 'use strict';
 
-var _ = require('underscore'),
-    Promise = require('promise');
+var Promise = require('promise');
 
 module.exports = {
 
@@ -81,8 +80,12 @@ module.exports = {
   compileWindow: function(url) {
     return new Promise(function(fulfill, reject) {
       require('jsdom').env(url, [], function(errors, window) {
-        if (errors) reject(errors);
-        else fulfill(window);
+        if (errors) {
+          reject(errors);
+        }
+        else {
+          fulfill(window);
+        }
       });
     });
   },
